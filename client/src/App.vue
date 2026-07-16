@@ -1,56 +1,94 @@
 <template>
   <div class="app">
-    <header class="top-nav">
-      <div class="nav-container">
-        <div class="logo">
-          <h1>{{ t('nav.companyName') }}</h1>
-          <span class="subtitle">{{ t('nav.subtitle') }}</span>
-        </div>
-        <nav class="nav-tabs">
-          <router-link to="/" :class="{ active: $route.path === '/' }">
-            {{ t('nav.overview') }}
-          </router-link>
-          <router-link to="/inventory" :class="{ active: $route.path === '/inventory' }">
-            {{ t('nav.inventory') }}
-          </router-link>
-          <router-link to="/orders" :class="{ active: $route.path === '/orders' }">
-            {{ t('nav.orders') }}
-          </router-link>
-          <router-link to="/spending" :class="{ active: $route.path === '/spending' }">
-            {{ t('nav.finance') }}
-          </router-link>
-          <router-link to="/demand" :class="{ active: $route.path === '/demand' }">
-            {{ t('nav.demandForecast') }}
-          </router-link>
-          <router-link to="/reports" :class="{ active: $route.path === '/reports' }">
-            Reports
-          </router-link>
-        </nav>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h1>{{ t('nav.companyName') }}</h1>
+        <span class="sidebar-subtitle">{{ t('nav.subtitle') }}</span>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <!-- Root link uses exact path match so it isn't marked active on every route -->
+        <router-link
+          to="/"
+          :class="{ active: $route.path === '/' }"
+          :aria-current="$route.path === '/' ? 'page' : undefined"
+        >
+          {{ t('nav.overview') }}
+        </router-link>
+        <router-link
+          to="/inventory"
+          :class="{ active: $route.path === '/inventory' }"
+          :aria-current="$route.path === '/inventory' ? 'page' : undefined"
+        >
+          {{ t('nav.inventory') }}
+        </router-link>
+        <router-link
+          to="/orders"
+          :class="{ active: $route.path === '/orders' }"
+          :aria-current="$route.path === '/orders' ? 'page' : undefined"
+        >
+          {{ t('nav.orders') }}
+        </router-link>
+        <router-link
+          to="/spending"
+          :class="{ active: $route.path === '/spending' }"
+          :aria-current="$route.path === '/spending' ? 'page' : undefined"
+        >
+          {{ t('nav.finance') }}
+        </router-link>
+        <router-link
+          to="/demand"
+          :class="{ active: $route.path === '/demand' }"
+          :aria-current="$route.path === '/demand' ? 'page' : undefined"
+        >
+          {{ t('nav.demandForecast') }}
+        </router-link>
+        <router-link
+          to="/reports"
+          :class="{ active: $route.path === '/reports' }"
+          :aria-current="$route.path === '/reports' ? 'page' : undefined"
+        >
+          {{ t('nav.reports') }}
+        </router-link>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- Static info only: drop-down widgets placed here would be clipped
+             by the sidebar's overflow-y -->
+        <span>{{ t('nav.companyName') }} v1.0.0</span>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="content-header">
+        <div class="content-header-spacer"></div>
         <LanguageSwitcher />
         <ProfileMenu
           @show-profile-details="showProfileDetails = true"
           @show-tasks="showTasks = true"
         />
-      </div>
-    </header>
-    <FilterBar />
-    <main class="main-content">
-      <router-view />
-    </main>
+      </header>
 
-    <ProfileDetailsModal
-      :is-open="showProfileDetails"
-      @close="showProfileDetails = false"
-    />
+      <FilterBar />
 
-    <TasksModal
-      :is-open="showTasks"
-      :tasks="tasks"
-      @close="showTasks = false"
-      @add-task="addTask"
-      @delete-task="deleteTask"
-      @toggle-task="toggleTask"
-    />
+      <main class="main-content">
+        <router-view />
+      </main>
+
+      <ProfileDetailsModal
+        :is-open="showProfileDetails"
+        @close="showProfileDetails = false"
+      />
+
+      <TasksModal
+        :is-open="showTasks"
+        :tasks="tasks"
+        @close="showTasks = false"
+        @add-task="addTask"
+        @delete-task="deleteTask"
+        @toggle-task="toggleTask"
+      />
+    </div>
   </div>
 </template>
 
@@ -162,6 +200,55 @@ export default {
 </script>
 
 <style>
+:root {
+  /* Colors — promoted from the app's existing slate/blue palette, not invented */
+  --color-primary: #2563eb;
+  --color-primary-light: #3b82f6;
+  --color-primary-tint: #eff6ff;   /* active-nav / info tint used app-wide */
+  --color-text: #0f172a;
+  --color-text-body: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-surface: #ffffff;
+  --color-bg: #f8fafc;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+
+  /* Spacing — 4/8px-based scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Radii & shadows — the app's most common existing values */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-dropdown: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  /* Layout. 240px sidebar fits the longest nav label in both locales
+     ("Demand Forecast" / 需要予測) on one line with room for the accent bar. */
+  --sidebar-width: 240px;
+  --header-height: 56px;
+
+  /* Z-index scale, mirroring the audited stacking order:
+     sidebar (50) < sticky filter bar (90) < content header (100) < dropdown
+     menus (1000, hardcoded in ProfileMenu/LanguageSwitcher) < modals (1000/2000).
+     The content header must beat the filter bar: sticky + z-index makes the
+     header a stacking context, so the dropdowns it hosts can only paint above
+     the filter bar if the header itself does (the old 70px top-nav was 100). */
+  --z-sidebar: 50;
+  --z-sticky: 90;
+  --z-header: 100;
+  --z-dropdown: 1000;
+  --z-modal: 2000;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -170,100 +257,123 @@ export default {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
+  background: var(--color-bg);
+  color: var(--color-text-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Two-column app shell. Grid (not flex) so the sidebar column is rigid
+   and wide content can't push it around. */
 .app {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
   min-height: 100vh;
 }
 
-.top-nav {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+.sidebar {
+  /* sticky + 100vh keeps the sidebar pinned while the content column scrolls */
   position: sticky;
   top: 0;
-  z-index: 100;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  /* below the sticky header/filter bars so their dropdowns/shadows win overlaps */
+  z-index: var(--z-sidebar);
 }
 
-.nav-container {
-  max-width: 1600px;
-  margin: 0 auto;
+.sidebar-brand {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-brand h1 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+}
+
+.sidebar-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.sidebar-nav {
+  flex: 1; /* pushes the footer to the bottom */
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav a {
   display: flex;
   align-items: center;
-  padding: 0 2rem;
-  height: 70px;
-}
-
-.nav-container > .nav-tabs {
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
-.nav-container > .language-switcher {
-  margin-right: 1rem;
-}
-
-.logo {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-}
-
-.logo h1 {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-}
-
-.subtitle {
-  font-size: 0.813rem;
-  color: #64748b;
-  font-weight: 400;
-  padding-left: 0.75rem;
-  border-left: 1px solid #e2e8f0;
-}
-
-.nav-tabs {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.nav-tabs a {
-  padding: 0.625rem 1.25rem;
-  color: #64748b;
-  text-decoration: none;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
   font-weight: 500;
-  font-size: 0.938rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  position: relative;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  /* transparent accent reserves the space so the active state doesn't shift text */
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s;
 }
 
-.nav-tabs a:hover {
-  color: #0f172a;
-  background: #f1f5f9;
+.sidebar-nav a:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-.nav-tabs a.active {
-  color: #2563eb;
-  background: #eff6ff;
+.sidebar-nav a.active {
+  background: var(--color-primary-tint);
+  border-left-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
-.nav-tabs a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #2563eb;
+.sidebar-nav a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.sidebar-footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.content {
+  /* min-width: 0 lets this grid child shrink; without it, wide tables/charts
+     force horizontal page overflow */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-8);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  /* above the filter bar so the ProfileMenu/LanguageSwitcher dropdowns
+     (children of this stacking context) are not painted under it */
+  z-index: var(--z-header);
+}
+
+.content-header-spacer {
+  flex: 1; /* pushes the widgets to the right edge */
 }
 
 .main-content {
@@ -271,7 +381,7 @@ body {
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.5rem 2rem;
+  padding: var(--space-6) var(--space-8);
 }
 
 .page-header {
