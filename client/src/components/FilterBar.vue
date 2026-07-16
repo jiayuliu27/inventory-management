@@ -102,18 +102,21 @@ export default {
 
 <style scoped>
 .filters-bar {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
   padding: 0.75rem 0;
   position: sticky;
-  top: 70px;
-  z-index: 90;
+  /* anchored below the slim content header, not the removed 70px top-nav */
+  top: var(--header-height);
+  z-index: var(--z-sticky);
 }
 
 .filters-container {
+  /* mirrors .main-content's max-width/margin/padding so the filters stay
+     aligned with page content now that both live inside the content column */
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 var(--space-8);
   display: flex;
   align-items: center;
   gap: 1rem;
